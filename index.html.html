@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minuta em Dia — Acompanhamento inteligente de envios de minuta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0b0f12;--panel:#12181f;--muted:#94a3b8;--text:#e6f4f1;--brand:#00b894;--brand2:#0ea5a7;--danger:#ef4444;--ok:#22c55e;--card:#0f141a;--shadow:0 10px 25px rgba(0,0,0,.35);--radius:18px}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,#0b0f12 0%,#0c1116 60%,#0b0f12);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:1160px;margin:0 auto;padding:28px 18px 72px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}
+    .logo{display:flex;align-items:center;gap:14px}
+    .logo svg{width:42px;height:42px}
+    .logo h1{font-size:1.35rem;margin:0;font-weight:700;letter-spacing:.4px}
+    .tagline{color:var(--muted);font-size:.9rem;margin-top:2px}
+    .controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    button,.chip,select{background:var(--panel);border:1px solid rgba(255,255,255,.07);color:var(--text);padding:10px 14px;border-radius:14px;cursor:pointer;font-weight:600}
+    button:hover,select:hover{border-color:rgba(255,255,255,.2)}
+    .chip{font-size:.9rem}
+    .brandbar{height:4px;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:999px;margin:14px 0 10px}
+
+    .tabs{display:flex;gap:6px;padding:10px}
+    .tab{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.07);background:var(--card);cursor:pointer;font-weight:600}
+    .tab.active{outline:2px solid var(--brand)}
+    .hidden{display:none}
+
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{grid-column:span 12;background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .card .hd{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .card .hd h3{margin:0;font-size:1rem;font-weight:700}
+    .card .bd{padding:14px 18px}
+
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+    .seg{display:flex;background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
+    .seg button{border:0;border-right:1px solid rgba(255,255,255,.08);padding:10px 12px;background:transparent;color:var(--text);cursor:pointer;font-weight:600}
+    .seg button:last-child{border-right:0}
+    .seg button.active{background:rgba(255,255,255,.06);outline:2px solid var(--brand)}
+
+    .kpis{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .kpi{grid-column:span 12;background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px 18px}
+    .k-title{color:var(--muted);font-size:.9rem;margin-bottom:8px}
+    .k-value{font-size:2rem;font-weight:800}
+    .k-trend{font-size:.85rem;margin-top:6px}
+    @media(min-width:680px){.kpi{grid-column:span 6}}
+    @media(min-width:980px){.kpi{grid-column:span 3}.xl-6{grid-column:span 6}}
+
+    .table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    .table th{color:var(--muted);text-align:left;font-size:.85rem;font-weight:600;padding:0 8px 6px}
+    .table td{background:var(--card);border:1px solid rgba(255,255,255,.06);padding:12px 10px}
+    .table tr td:first-child{border-radius:10px 0 0 10px}
+    .table tr td:last-child{border-radius:0 10px 10px 0}
+    .badge{padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:700;letter-spacing:.2px;display:inline-block}
+    .ok{background:rgba(34,197,94,.15);color:#34d399;border:1px solid rgba(34,197,94,.35)}
+    .late{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.35)}
+
+    .footer{margin-top:22px;color:var(--muted);font-size:.85rem}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo" title="Minuta em Dia">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#00b894"/><stop offset="100%" stop-color="#0ea5a7"/></linearGradient></defs><rect rx="14" ry="14" x="2" y="2" width="60" height="60" fill="#0f141a" stroke="url(#g)" stroke-width="2"/><path d="M12 42 L12 22 L22 40 L32 22 L42 40 L52 22 L52 42" fill="none" stroke="url(#g)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="2" fill="#00b894"/><circle cx="32" cy="46" r="2" fill="#00b894"/><circle cx="44" cy="46" r="2" fill="#00b894"/></svg>
+        <div>
+          <h1>Minuta em Dia</h1>
+          <div class="tagline">Acompanhamento inteligente de envios de minuta</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="refreshBtn">↻ Atualizar agora</button>
+        <span class="chip" id="lastUpdate">—</span>
+      </div>
+    </header>
+
+    <div class="brandbar"></div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="visao">Visão Dados</div>
+      <div class="tab" data-tab="bi">Visão Power BI</div>
+    </div>
+
+    <section id="visao" class="grid">
+      <div class="card"><div class="hd"><h3>Filtros</h3></div>
+        <div class="bd">
+          <div class="toolbar">
+            <label>Advogado:
+              <select id="fLawyer"><option value="__ALL__">Todos</option></select>
+            </label>
+            <div class="seg" role="tablist" aria-label="Status">
+              <button class="active" data-status="ALL">Todos</button>
+              <button data-status="OK">No prazo</button>
+              <button data-status="LATE">Fora do prazo</button>
+            </div>
+            <button id="clearFilters">Limpar filtros</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpis card">
+        <div class="kpi"><div class="k-title">Registros</div><div class="k-value" id="kReg">0</div><div class="k-trend" id="kRegSub">—</div></div>
+        <div class="kpi"><div class="k-title">Dentro do prazo</div><div class="k-value" id="kOn">0</div><div class="k-trend" id="kOnSub">—</div></div>
+        <div class="kpi"><div class="k-title">Fora do prazo</div><div class="k-value" id="kLate">0</div><div class="k-trend" id="kLateSub">—</div></div>
+        <div class="kpi"><div class="k-title">% no prazo</div><div class="k-value" id="kPct">0%</div><div class="k-trend" id="kPctSub">—</div></div>
+        <div class="kpi"><div class="k-title">% fora do prazo</div><div class="k-value" id="kPctLate">0%</div><div class="k-trend" id="kPctLateSub">—</div></div>
+      </div>
+
+      <div class="card xl-6"><div class="hd"><h3>Por Advogado</h3></div><div class="bd"><canvas id="chartByLawyer" height="200"></canvas></div></div>
+      <div class="card xl-6"><div class="hd"><h3>Evolução semanal</h3></div><div class="bd"><canvas id="chartWeekly" height="200"></canvas></div></div>
+
+      <div class="card"><div class="hd"><h3>Últimos envios</h3></div><div class="bd">
+        <table class="table" id="tbl"><thead><tr>
+          <th>ID Prazo</th><th>Prazo</th><th>Advogado</th><th>Cliente</th><th>Data Fatal</th><th>Data Envio</th><th>SLA</th><th>Antecedência (DU)</th><th>Status</th>
+        </tr></thead><tbody></tbody></table>
+      </div></div>
+    </section>
+
+    <section id="bi" class="grid hidden">
+      <div class="card" style="grid-column:span 12;"><div class="hd"><h3>Dashboard Power BI</h3></div><div class="bd">
+        <div style="position:relative;padding-top:56.25%;background:#0b0f12;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden">
+          <iframe id="biFrame" title="Power BI" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
+        </div>
+      </div></div>
+    </section>
+
+    <div class="footer">Fonte de dados: Google Sheets <strong>sem CSV</strong> (GViz JSON via JSONP). Atualize manualmente ou aguarde atualização automática.</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    // ===== CONFIG (SEM CSV) =====
+    const DEST_SHEET_ID = "1pkvbPLiPhfIuZcJq6yQxBbBLR1HrpNk38y_pCnpu6CM"; // sua planilha
+    const DEST_GID = "0"; // aba
+    const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${DEST_SHEET_ID}/gviz/tq?tqx=out:json&gid=${DEST_GID}`;
+    const POWER_BI_URL = "https://app.powerbi.com/view?r=eyJrIjoiYTM1N2IxZGMtOTFiNC00YzViLTk3OTEtOTY3YzRmNWFiOTEyIiwidCI6IjM2NDZmODI0LWFjNDQtNDViNC1hNjllLTQ0YWI1MTBmNmFhZiJ9";
+
+    // ===== Utils =====
+    const el = s => document.querySelector(s);
+    const pad = n => String(n).padStart(2,'0');
+    const fmtBR = d => d ? `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}` : '';
+    const weekKey = d=>{ const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())); const dayNum=(t.getUTCDay()+6)%7; t.setUTCDate(t.getUTCDate()-dayNum+3); const firstThu=new Date(Date.UTC(t.getUTCFullYear(),0,4)); const week=1+Math.round(((t-firstThu)/86400000-3+(firstThu.getUTCDay()+6)%7)/7); return `${t.getUTCFullYear()}-S${pad(week)}`; };
+    const normalizeKey = s => (s||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+    const getField = (row, keys) => { const map=Object.fromEntries(Object.keys(row).map(k=>[normalizeKey(k),k])); for(const key of keys){ const nk=normalizeKey(key); for(const [norm,orig] of Object.entries(map)){ if(norm.includes(nk)) return row[orig]; } } return undefined; };
+    const parseDatePT = v => { if(!v) return null; if(v instanceof Date) return v; if(typeof v==='number'){ const excelEpoch=new Date(Date.UTC(1899,11,30)); return new Date(excelEpoch.getTime()+v*86400000); } const s=String(v).trim(); const iso=Date.parse(s); if(!isNaN(iso)) return new Date(iso); const m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/); if(m){ const d=parseInt(m[1],10), mo=parseInt(m[2],10)-1, y=parseInt(m[3].length===2?('20'+m[3]):m[3],10); return new Date(y,mo,d); } return null; };
+
+    // ===== SLA helpers =====
+    function isWeekend(d){ const day=d.getDay(); return day===0||day===6; }
+    function isHoliday(d){ const HOLIDAYS=[]; const k=d.toISOString().slice(0,10); return HOLIDAYS.includes(k); }
+    const isBusinessDay = d => !isWeekend(d) && !isHoliday(d);
+    const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
+    function businessDaysToDeadline(envio,fatal){ if(!envio||!fatal) return null; const e=startOfDay(envio), f=startOfDay(fatal); if(e.getTime()===f.getTime()) return 0; let days=0; const cur=new Date(e); cur.setDate(cur.getDate()+1); while(cur.getTime()<=f.getTime()){ if(isBusinessDay(cur)) days++; cur.setDate(cur.getDate()+1);} return days; }
+    function inferSLAAllowedDays(desc,prazoDU){ const d=(desc||'').toString().toUpperCase(); if(d.includes('DECLARAÇÃO')) return 1; const n=Number(prazoDU); if(Number.isFinite(n)) return n<=5?1:2; return 2; }
+    function explicitStatusFromRow(row){ const explicit=getField(row,['no prazo','dentro do prazo','enviada no prazo','enviado no prazo','status prazo','status']); if(!explicit) return null; const v=normalizeKey(explicit); if(v.includes('sim')||v.includes('dentro')||v.includes('ok')) return 'OK'; if(v.includes('nao')||v.includes('não')||v.includes('fora')) return 'LATE'; return null; }
+    function computeStatus(out, raw){ const exp=explicitStatusFromRow(raw); if(exp) return {status:exp,slaAllowed:null,antecedencia:null,slaLabel:null}; const slaAllowed=inferSLAAllowedDays(out.descricao,out.prazo_total_du); const antecedencia=businessDaysToDeadline(out.data_envio,out.data_fatal); if(antecedencia==null) return {status:'LATE',slaAllowed,antecedencia,slaLabel:slaAllowed===1?'D-1':'D-2'}; const ok=antecedencia>=slaAllowed; return {status:ok?'OK':'LATE',slaAllowed,antecedencia,slaLabel:slaAllowed===1?'D-1':'D-2'}; }
+
+    // ===== GViz via JSONP (sem CORS) =====
+    function loadGVizJSONP(url){
+      return new Promise((resolve,reject)=>{
+        const prev = window.google && window.google.visualization && window.google.visualization.Query && window.google.visualization.Query.setResponse;
+        window.google = window.google || {};
+        window.google.visualization = window.google.visualization || {};
+        window.google.visualization.Query = window.google.visualization.Query || {};
+        window.google.visualization.Query.setResponse = (payload)=>{ cleanup(); resolve(payload); };
+        const script=document.createElement('script');
+        script.src = url + (url.includes('?')?'&':'?') + 'rand=' + Date.now();
+        script.onerror = (e)=>{ cleanup(); reject(e); };
+        function cleanup(){
+          if(prev) window.google.visualization.Query.setResponse = prev; else try{ delete window.google.visualization.Query.setResponse; }catch(_){ }
+          script.remove();
+        }
+        document.head.appendChild(script);
+      });
+    }
+    function mapToObjects(gviz){ const cols=gviz.table.cols.map(c=>c.label||c.id||''); const out=[]; for(const r of gviz.table.rows){ const obj={}; cols.forEach((label,idx)=>{ const cell=r.c[idx]; obj[label||('col_'+idx)]=cell?cell.v:''; }); out.push(obj);} return out; }
+    async function fetchGVizRows(){ const payload = await loadGVizJSONP(GVIZ_URL); return mapToObjects(payload); }
+
+    // ===== Estado & Filtros =====
+    let RAW=[], FILTERED=[], STATUS='ALL', LAWYER='__ALL__';
+
+    function applyFilters(){
+      FILTERED = RAW.filter(r=>{
+        if(LAWYER!=='__ALL__' && (r.advogado||'—')!==LAWYER) return false;
+        if(STATUS==='OK' && r._status!=='OK') return false;
+        if(STATUS==='LATE' && r._status!=='LATE') return false;
+        return true;
+      });
+    }
+
+    function populateLawyers(){
+      const set = new Set(RAW.map(r=>r.advogado||'—'));
+      const sel = el('#fLawyer'); sel.innerHTML='<option value="__ALL__">Todos</option>';
+      [...set].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'})).forEach(n=>{
+        const opt=document.createElement('option'); opt.value=n; opt.textContent=n; sel.appendChild(opt);
+      });
+      sel.value = LAWYER;
+    }
+
+    // ===== Render =====
+    let chartByLawyer, chartWeekly;
+
+    function renderKPIs(rows){ const total=rows.length; const on=rows.filter(r=>r._status==='OK').length; const late=total-on; el('#kReg').textContent=total; el('#kOn').textContent=on; el('#kLate').textContent=late; el('#kPct').textContent= total? ((on/total)*100).toFixed(1)+'%':'0%'; el('#kPctSub').textContent='Índice de conformidade.'; el('#kPctLate').textContent= total? ((late/total)*100).toFixed(1)+'%':'0%'; el('#kPctLateSub').textContent='% fora do prazo.'; el('#kRegSub').textContent='Total de registros.'; el('#kOnSub').textContent='Envios DENTRO do prazo.'; el('#kLateSub').textContent='Envios FORA do prazo.'; }
+
+    function renderTable(rows){ const tb=el('#tbl tbody'); tb.innerHTML=''; const ordered=[...rows].sort((a,b)=>(b.data_envio?.getTime()||0)-(a.data_envio?.getTime()||0)).slice(0,100); for(const r of ordered){ const tr=document.createElement('tr'); const badge=`<span class="badge ${r._status==='OK'?'ok':'late'}">${r._status==='OK'?'NO PRAZO':'FORA'}</span>`; tr.innerHTML=`<td>${r.id||''}</td><td>${r.prazo||''}</td><td>${r.advogado||''}</td><td>${r.cliente||''}</td><td>${r.data_fatal?fmtBR(r.data_fatal):''}</td><td>${r.data_envio?fmtBR(r.data_envio):''}</td><td>${r._slaLabel||''}</td><td>${Number.isFinite(r._antecedencia)?r._antecedencia:'—'}</td><td>${badge}</td>`; tb.appendChild(tr);} }
+
+    function renderCharts(rows){
+      const by=new Map(); for(const r of rows){ const k=r.advogado||'—'; const o=by.get(k)||{ok:0,late:0}; if(r._status==='OK') o.ok++; else o.late++; by.set(k,o);} const labels=[...by.keys()]; const dsOK=labels.map(k=>by.get(k).ok); const dsLate=labels.map(k=>by.get(k).late); const c1=document.getElementById('chartByLawyer'); if(chartByLawyer) chartByLawyer.destroy(); chartByLawyer=new Chart(c1,{type:'bar',data:{labels,datasets:[{label:'No prazo',data:dsOK,stack:'s'},{label:'Fora do prazo',data:dsLate,stack:'s'}]},options:{responsive:true,plugins:{legend:{display:true}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
+      const wk=new Map(); for(const r of rows){ if(!r.data_envio) continue; const w=weekKey(r.data_envio); const v=wk.get(w)||{ok:0,late:0}; if(r._status==='OK') v.ok++; else v.late++; wk.set(w,v);} const wLabels=[...wk.keys()].sort(); const wOK=wLabels.map(k=>wk.get(k).ok); const wLate=wLabels.map(k=>wk.get(k).late); const c2=document.getElementById('chartWeekly'); if(chartWeekly) chartWeekly.destroy(); chartWeekly=new Chart(c2,{type:'line',data:{labels:wLabels,datasets:[{label:'No prazo',data:wOK,tension:.35},{label:'Fora do prazo',data:wLate,tension:.35}]},options:{responsive:true,plugins:{legend:{display:true}},scales:{y:{beginAtZero:true}}}});
+    }
+
+    function renderAll(){ renderKPIs(FILTERED); renderCharts(FILTERED); renderTable(FILTERED); }
+
+    // ===== Pipeline =====
+    function normalizeRows(raw){ return raw.map(r=>{ const out={ id:getField(r,['id','id prazo','id do prazo']), prazo:getField(r,['prazo','nome do prazo','descricao','descrição']), advogado:getField(r,['advogado','executor','responsavel','responsável'])||'—', cliente:getField(r,['cliente','empresa','conta']), data_fatal:parseDatePT(getField(r,['data fatal','data vencimento','data limite'])), data_envio:parseDatePT(getField(r,['data envio','data de envio da minuta','data do envio'])), descricao:getField(r,['descricao','descrição']), prazo_total_du:getField(r,['prazo total em dias uteis','prazo total dias uteis','prazo total (du)']) }; const comp=computeStatus(out,r); out._status=comp.status; out._slaAllowed=comp.slaAllowed; out._antecedencia=comp.antecedencia; out._slaLabel=comp.slaLabel; return out; }).filter(r=>r.id||r.prazo||r.data_envio||r.data_fatal); }
+
+    async function refresh(){ el('#lastUpdate').textContent='Atualizando…'; try{ const raw=await fetchGVizRows(); RAW=normalizeRows(raw); populateLawyers(); applyFilters(); renderAll(); const t=new Date(); el('#lastUpdate').textContent='Atualizado às '+pad(t.getHours())+':'+pad(t.getMinutes()); }catch(e){ el('#lastUpdate').textContent='Erro ao carregar dados'; console.error(e);} }
+
+    // ===== Eventos UI =====
+    document.querySelectorAll('.tab').forEach(t=>{ t.addEventListener('click',()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); const tab=t.getAttribute('data-tab'); el('#visao').classList.toggle('hidden',tab!=='visao'); el('#bi').classList.toggle('hidden',tab!=='bi'); }); });
+    el('#refreshBtn').addEventListener('click', refresh);
+    el('#biFrame').src = POWER_BI_URL;
+
+    el('#fLawyer').addEventListener('change', e=>{ LAWYER=e.target.value; applyFilters(); renderAll(); });
+    document.querySelectorAll('.seg button').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.seg button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); STATUS=btn.dataset.status; applyFilters(); renderAll(); }); });
+    el('#clearFilters').addEventListener('click',()=>{ LAWYER='__ALL__'; STATUS='ALL'; el('#fLawyer').value='__ALL__'; document.querySelectorAll('.seg button').forEach((b,i)=>b.classList.toggle('active',i===0)); applyFilters(); renderAll(); });
+
+    // Init
+    refresh();
+    setInterval(refresh, 5*60*1000);
+  </script>
+</body>
+</html>
