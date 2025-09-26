@@ -1,464 +1,471 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Relatório Preditivo – Escritório Tributário</title>
-  <style>
-    /* Reset básico */
-    * { margin:0; padding:0; box-sizing: border-box; }
-    body {
-      background: #0d0f12;
-      color: #e0e0e0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      overflow-x: hidden;
-    }
-    header {
-      position: relative;
-      padding: 20px;
-      text-align: center;
-      background: linear-gradient(90deg, #00ff99, #00cc66);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      transform: perspective(600px) rotateX(5deg);
-    }
-    header img.logo {
-      height: 80px;
-      /* coloque a sua logo aqui */
-    }
-    header h1 {
-      margin-top: 15px;
-      font-size: 2.5em;
-      color: #ffffff;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
-    }
-    nav#presenterNotesIcon {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 40px;
-      height: 40px;
-      background: #00ff66;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-      z-index: 1000;
-      transition: transform 0.3s;
-    }
-    nav#presenterNotesIcon:hover {
-      transform: scale(1.2);
-    }
-    nav#presenterNotesIcon:before {
-      content: "🛈";
-      font-size: 1.8em;
-      color: #0d0f12;
-    }
-    /* painel lateral de notas do apresentador */
-    #presenterNotesPanel {
-      position: fixed;
-      top: 0;
-      right: -400px;
-      width: 400px;
-      height: 100%;
-      background: #1a1d22;
-      color: #cfd8dc;
-      box-shadow: -4px 0 20px rgba(0,0,0,0.7);
-      transition: right 0.4s;
-      padding: 20px;
-      overflow-y: auto;
-      z-index: 999;
-    }
-    #presenterNotesPanel h2 {
-      margin-bottom:10px;
-      color: #00ff99;
-    }
-    #presenterNotesPanel .close-btn {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      font-size: 1.5em;
-      cursor: pointer;
-      color: #00ff99;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dashboard Preditivo - Escritório Tributário</title>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+  
+  /* Reset e base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: #0a0f12;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #a1f7d5;
+    overflow-x: hidden;
+  }
+  
+  /* Header */
+  header {
+    background: linear-gradient(90deg, #00ff99, #00cc66);
+    display: flex;
+    align-items: center;
+    padding: 15px 30px;
+    box-shadow: 0 5px 15px #00ff99aa;
+    position: relative;
+    user-select: none;
+  }
+  header img.logo {
+    height: 70px;
+    margin-right: 20px;
+    filter: drop-shadow(0 0 6px #00ff99);
+  }
+  header h1 {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 2.8rem;
+    text-shadow: 0 0 15px #00ff99;
+  }
+
+  /* Main container */
+  main {
+    padding: 25px 40px 60px 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+    gap: 35px;
+  }
+
+  /* KPI cards */
+  .kpi-card {
+    background: #051312cc;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 0 20px #00ff99aa;
+    position: relative;
+    cursor: default;
+    transition: transform 0.3s ease;
+  }
+  .kpi-card:hover {
+    transform: translateZ(15px) scale(1.05);
+    box-shadow: 0 0 30px #00ff99ee;
+  }
+  .kpi-title {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    text-shadow: 0 0 7px #00ff99;
+  }
+  .kpi-value {
+    font-size: 2.8rem;
+    font-weight: 900;
+    font-family: 'Orbitron', monospace;
+    text-shadow: 0 0 10px #00ff99;
+  }
+  .kpi-sub {
+    margin-top: 5px;
+    font-size: 0.9rem;
+    color: #70e6b8;
+  }
+
+  /* Tooltip */
+  .tooltip {
+    position: absolute;
+    background: #003322dd;
+    color: #a1f7d5;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    max-width: 280px;
+    z-index: 1000;
+    box-shadow: 0 0 12px #00ff99bb;
+  }
+
+  /* Charts container */
+  .chart-container {
+    background: #051312cc;
+    padding: 20px 30px 30px 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 25px #00ff9955;
+    cursor: default;
+    position: relative;
+  }
+  .chart-container:hover {
+    box-shadow: 0 0 40px #00ff99ee;
+  }
+  .chart-title {
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+    color: #00ff99;
+    text-shadow: 0 0 10px #00ff99;
+  }
+
+  /* Sidebar for presenter notes */
+  #notesPanel {
+    position: fixed;
+    top: 0;
+    right: -360px;
+    width: 360px;
+    height: 100vh;
+    background: #012214ee;
+    box-shadow: -8px 0 18px #00ff9944;
+    backdrop-filter: blur(6px);
+    color: #a1f7d5;
+    padding: 25px;
+    overflow-y: auto;
+    transition: right 0.35s ease;
+    z-index: 1100;
+  }
+  #notesPanel.open {
+    right: 0;
+  }
+  #notesPanel h2 {
+    font-family: 'Orbitron', monospace;
+    margin-top: 0;
+    font-size: 1.8rem;
+    color: #00ff99;
+    text-shadow: 0 0 15px #00ff99;
+  }
+  #notesPanel p {
+    line-height: 1.4;
+    margin-bottom: 1rem;
+  }
+  #notesPanel small {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: #00cc77aa;
+  }
+  #notesPanel .closeBtn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #00ff99;
+    user-select: none;
+    transition: color 0.3s ease;
+  }
+  #notesPanel .closeBtn:hover {
+    color: #00cc66;
+  }
+
+  /* Button to open notes */
+  #openNotesBtn {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    filter: drop-shadow(0 0 3px #00ff99);
+    z-index: 1200;
+  }
+  #openNotesBtn svg {
+    width: 38px;
+    height: 38px;
+    fill: #00ff99;
+    transition: transform 0.3s ease;
+  }
+  #openNotesBtn:hover svg {
+    transform: rotate(360deg);
+    fill: #00cc66;
+  }
+
+  /* Responsive tweaks */
+  @media (max-width: 720px) {
     main {
-      padding: 40px;
-      max-width: 1200px;
-      margin: auto;
+      padding: 20px;
+      grid-template-columns: 1fr;
     }
-    section {
-      margin-bottom: 60px;
-      position: relative;
-    }
-    section h2, section h3 {
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: #00ff99;
-      cursor: default;
-    }
-    section h2:hover, section h3:hover {
-      color: #66ffcc;
-    }
-    /* tooltip base */
-    .tooltip {
-      position: absolute;
-      background: rgba(0, 255, 102, 0.9);
-      color: #0d0f12;
-      padding: 8px 12px;
-      border-radius: 4px;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s;
-      font-size: 0.9em;
-      max-width: 300px;
-      z-index: 1000;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    }
-    /* KPI cards */
-    .kpi-cards {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    .kpi-card {
-      background: #1f2227;
-      border: 2px solid #00ff99;
-      border-radius: 10px;
-      flex: 1 1 calc(33% - 40px);
-      min-width: 250px;
-      padding: 30px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      transition: transform 0.3s;
-      position: relative;
-    }
-    .kpi-card:hover {
-      transform: translateY(-10px) scale(1.02);
-      border-color: #66ffcc;
-    }
-    .kpi-card .value {
-      font-size: 2.5em;
-      color: #ffffff;
-      margin: 15px 0;
-    }
-    .kpi-card .subtitle {
-      font-size: 1.2em;
-      color: #cfd8dc;
-    }
-    /* gráfico simulado */
-    .chart {
+    #notesPanel {
       width: 100%;
-      height: 400px;
-      background: #1a1d22;
-      border: 2px solid #00ff99;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-      position: relative;
-      overflow: hidden;
-      perspective: 800px;
-      margin-top:20px;
+      right: -100%;
     }
-    .chart-canvas {
-      width: 100%;
-      height: 100%;
+    #notesPanel.open {
+      right: 0;
     }
-    footer {
-      text-align: center;
-      padding: 30px;
-      color: #777;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
-  <header>
-    <!-- troque src abaixo pela sua logo -->
-    <img src="logo.png" alt="Logo Escritório Tributário" class="logo">
-    <h1>Relatório Preditivo – Escritório Tributário</h1>
-  </header>
+<header>
+  <img src="logo.png" alt="Logo Escritório Tributário" class="logo" />
+  <h1>Relatório Preditivo – Escritório Tributário</h1>
+</header>
 
-  <nav id="presenterNotesIcon"></nav>
-
-  <div id="presenterNotesPanel">
-    <span class="close-btn">✖</span>
-    <h2>Notas do Apresentador</h2>
-    <p><strong>O que é este relatório:</strong> Apresenta uma visão preditiva da operação tributária do escritório, com projeções, riscos, produtividade e valores disputados, para suportar decisões estratégicas.</p>
-    <p><strong>Objetivo:</strong> Fornecer ao sócio informações antecipadas para priorização de recursos, mitigação de riscos e otimização operacional.</p>
-    <p><strong>Para que serve:</strong></p>
-    <ul>
-      <li>Identificar onde há risco de perda elevado e agir preventivamente.</li>
-      <li>Simular valores recuperáveis disponíveis para planejar orçamentos.</li>
-      <li>Melhorar prazos e produtividade com base em dados históricos e predições.</li>
-      <li>Apoiar decisões de investimento (ex: automação, contratação) para ganhos tangíveis.</li>
-    </ul>
-    <p><strong>O que mostra:</strong></p>
-    <ul>
-      <li>KPI’s principais: Valor em disputa, risco de perda, cumprimento de prazos, previsão de valor recuperado;</li>
-      <li>Modelos usados: classificação (Random Forest), séries temporais (Prophet) — exemplos simulados;</li>
-      <li>Visualizações: gráficos de linha, ranking de produtividade, mapa de risco por cliente, etc;</li>
-      <li>Insights estratégicos gerados automaticamente a partir dos dados simulados.</li>
-    </ul>
+<main>
+  <!-- KPI Cards -->
+  <div class="kpi-card" data-tooltip="Valor total em disputa no escritório tributário.">
+    <div class="kpi-title">Valor em Disputa</div>
+    <div class="kpi-value" id="kpiValorDisputa">R$ 120M</div>
+    <div class="kpi-sub">Montante em processos</div>
+  </div>
+  <div class="kpi-card" data-tooltip="Valor estimado a ser recuperado após análise preditiva.">
+    <div class="kpi-title">Valor a Recuperar</div>
+    <div class="kpi-value" id="kpiValorRecuperar">R$ 35M</div>
+    <div class="kpi-sub">Previsão em 12 meses</div>
+  </div>
+  <div class="kpi-card" data-tooltip="Percentual médio de cumprimento dos prazos do escritório.">
+    <div class="kpi-title">Cumprimento de Prazos</div>
+    <div class="kpi-value" id="kpiCumprimentoPrazos">92%</div>
+    <div class="kpi-sub">Média geral</div>
+  </div>
+  <div class="kpi-card" data-tooltip="Prazo médio de resposta das equipes.">
+    <div class="kpi-title">Prazo Médio de Resposta</div>
+    <div class="kpi-value" id="kpiPrazoResposta">4,2 dias</div>
+    <div class="kpi-sub">Redução esperada com automação</div>
   </div>
 
-  <main>
-    <section id="objetivo">
-      <h2 data-tooltip="Meta deste relatório para fornecer visão avançada ao sócio">1. Objetivo</h2>
-      <p>Fornecer ao sócio uma visão preditiva da operação tributária, com previsões de valores, riscos e produtividade. Esse relatório orienta decisões estratégicas do escritório.</p>
-    </section>
+  <!-- Charts -->
+  <section class="chart-container" data-tooltip="Distribuição de risco dos clientes no escritório.">
+    <div class="chart-title">Mapa de Risco por Cliente</div>
+    <canvas id="chartRiscoCliente"></canvas>
+  </section>
 
-    <section id="pipeline">
-      <h2 data-tooltip="Como os dados são processados antes da visualização">2. Pipeline de Dados</h2>
-      <p>O pipeline integra dados financeiros, processuais, de produtividade e CRM. As etapas são:</p>
-      <ul>
-        <li>Ingestão</li>
-        <li>Transformação</li>
-        <li>Armazenamento</li>
-        <li>Modelagem Preditiva</li>
-        <li>Visualização</li>
-      </ul>
-    </section>
+  <section class="chart-container" data-tooltip="Linha do tempo mostrando o fluxo financeiro e valores previstos.">
+    <div class="chart-title">Fluxo Financeiro (Projeção)</div>
+    <canvas id="chartFluxoFinanceiro"></canvas>
+  </section>
 
-    <section id="kpis">
-      <h2 data-tooltip="Principais métricas que orientam performance e riscos">3. Métricas e KPIs</h2>
-      <div class="kpi-cards">
-        <div class="kpi-card" data-tooltip="Total estimado em disputa atualmente">
-          <div class="subtitle">Valor em Disputa</div>
-          <div class="value">R$ 120 M</div>
-        </div>
-        <div class="kpi-card" data-tooltip="Estimativa de quanto pode ser perdido se não forem tratadas ações corretivas">
-          <div class="subtitle">Risco de Perda</div>
-          <div class="value">R$ 35 M a recuperar</div>
-        </div>
-        <div class="kpi-card" data-tooltip="Percentual de casos com prazos sendo respeitados">
-          <div class="subtitle">Cumprimento de Prazos</div>
-          <div class="value">92%</div>
-        </div>
-        <div class="kpi-card" data-tooltip="Prazo médio atual de resposta em dias">
-          <div class="subtitle">Prazo Médio de Resposta</div>
-          <div class="value">4,2 dias</div>
-        </div>
-        <div class="kpi-card" data-tooltip="Valor atual estimado para recuperação">
-          <div class="subtitle">Valor Atual</div>
-          <div class="value">R$ 18 M (±5%)</div>
-        </div>
-        <div class="kpi-card" data-tooltip="Previsão de valor recuperado até Q4">
-          <div class="subtitle">Previsão</div>
-          <div class="value">R$ 95 M</div>
-        </div>
-      </div>
-    </section>
+  <section class="chart-container" data-tooltip="Ranking de produtividade dos advogados do escritório.">
+    <div class="chart-title">Ranking de Produtividade</div>
+    <canvas id="chartRankingProdutividade"></canvas>
+  </section>
+</main>
 
-    <section id="modelos">
-      <h2 data-tooltip="Técnicas usadas para predizer resultados futuros">4. Modelos Preditivos (Simulação)</h2>
-      <p><strong>Classificação de Processos (Random Forest) – Acurácia: 87%</strong>. Exemplo: Ação X (78% chance de ganho), Ação Y (42% chance de ganho).</p>
-      <p><strong>Séries Temporais (Prophet)</strong> – Projeção de aumento de 12% no valor recuperado até Q4.</p>
-    </section>
+<!-- Notas do Apresentador -->
+<button id="openNotesBtn" aria-label="Abrir Notas do Apresentador" title="Notas do Apresentador">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h16v2H4zM4 8h10v2H4zM4 12h16v2H4zM4 16h10v2H4z"/></svg>
+</button>
+<aside id="notesPanel" aria-hidden="true" role="complementary">
+  <span class="closeBtn" id="closeNotesBtn" role="button" tabindex="0" aria-label="Fechar notas">&times;</span>
+  <h2>Notas do Apresentador</h2>
+  <p>Este relatório preditivo visa fornecer uma visão estratégica da operação tributária do escritório.</p>
+  <p>Apresenta KPIs fundamentais como valores em disputa, recuperação esperada, riscos e prazos.</p>
+  <p>Os gráficos mostram a distribuição de riscos por cliente, projeções financeiras e produtividade dos advogados.</p>
+  <p>Este dashboard ajuda a tomar decisões baseadas em dados para maximizar a recuperação e reduzir riscos.</p>
+  <small>Pressione ESC para fechar este painel.</small>
+</aside>
 
-    <section id="visualizacao">
-      <h2 data-tooltip="O que o dashboard visual mostrará para suportar insights">5. Visualização e Insights</h2>
+<!-- Tooltip element -->
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+  // Tooltip logic
+  const tooltip = document.getElementById('tooltip');
+
+  function showTooltip(e) {
+    const target = e.currentTarget;
+    const text = target.getAttribute('data-tooltip');
+    if (!text) return;
+
+    tooltip.textContent = text;
+    tooltip.style.opacity = '1';
+
+    const rect = target.getBoundingClientRect();
+    let left = e.pageX + 15;
+    let top = e.pageY + 15;
+
+    // Adjust to keep inside viewport
+    if (left + tooltip.offsetWidth > window.innerWidth) {
+      left = e.pageX - tooltip.offsetWidth - 15;
+    }
+    if (top + tooltip.offsetHeight > window.innerHeight) {
+      top = e.pageY - tooltip.offsetHeight - 15;
+    }
+
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = top + 'px';
+  }
+  function hideTooltip() {
+    tooltip.style.opacity = '0';
+  }
+
+  // Attach tooltip listeners
+  document.querySelectorAll('[data-tooltip]').forEach(el => {
+    el.addEventListener('mousemove', showTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
+
+  // Notas do apresentador
+  const notesPanel = document.getElementById('notesPanel');
+  const openNotesBtn = document.getElementById('openNotesBtn');
+  const closeNotesBtn = document.getElementById('closeNotesBtn');
+
+  openNotesBtn.addEventListener('click', () => {
+    notesPanel.classList.add('open');
+    notesPanel.setAttribute('aria-hidden', 'false');
+  });
+  closeNotesBtn.addEventListener('click', () => {
+    notesPanel.classList.remove('open');
+    notesPanel.setAttribute('aria-hidden', 'true');
+  });
+  // Fechar com ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && notesPanel.classList.contains('open')) {
+      notesPanel.classList.remove('open');
+      notesPanel.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+  // KPIs - animação simples de contagem
+  function animateKPI(id, start, end, duration, suffix='') {
+    const el = document.getElementById(id);
+    let startTime = null;
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const progress = timestamp - startTime;
+      let value = start + (end - start) * (progress / duration);
+      if (start < end) {
+        if (value > end) value = end;
+      } else {
+        if (value < end) value = end;
+      }
+      if (id === 'kpiCumprimentoPrazos') value = value.toFixed(0); // % int
+      else if (id === 'kpiPrazoResposta') value = value.toFixed(1);
+      else value = Math.floor(value);
+
+      el.textContent = (id === 'kpiPrazoResposta' || id === 'kpiCumprimentoPrazos') 
+        ? value + suffix 
+        : 'R$ ' + value + (id === 'kpiValorDisputa' || id === 'kpiValorRecuperar' ? 'M' : '');
       
-      <div class="chart" data-tooltip="Gráfico simulado de valor recuperado ao longo do tempo">
-        <canvas id="chartValueForecast" class="chart-canvas"></canvas>
-      </div>
-      
-      <div style="margin-top:40px;">
-        <h3 data-tooltip="Principais descobertas estratégicas baseadas nos dados">Insights</h3>
-        <ul>
-          <li data-tooltip="Se focarmos em processos > R$ 5 M podemos aumentar recuperação em 18%">Priorizar ações &gt; R$ 5 M aumenta recuperação em 18%</li>
-          <li data-tooltip="Alta concentração de valores em disputa em clientes com risco alto">63% dos valores em disputa concentram-se em clientes de risco alto</li>
-          <li data-tooltip="Automação diminui prazos médios significativamente">Automação reduz prazos em 26%</li>
-        </ul>
-      </div>
-    </section>
-
-    <section id="conclusao">
-      <h2 data-tooltip="Resumo final das projeções e recomendações">6. Conclusão</h2>
-      <p>O escritório pode recuperar até <strong>R$ 35 M em 12 meses</strong>, possui risco de perda de <strong>R$ 18 M</strong> concentrado em poucos clientes e pode melhorar a performance operacional em <strong>26% com automação</strong>.</p>
-    </section>
-  </main>
-
-  <footer>
-    &copy; 2025 Escritório Tributário – Todos os direitos reservados
-  </footer>
-
-  <!-- tooltip element -->
-  <div id="tooltip" class="tooltip"></div>
-
-  <script>
-    // Apresentador Notes: lógica de abrir/fechar painel
-    const presenterIcon = document.getElementById('presenterNotesIcon');
-    const presenterPanel = document.getElementById('presenterNotesPanel');
-    const closeBtn = document.querySelector('#presenterNotesPanel .close-btn');
-
-    presenterIcon.addEventListener('click', () => {
-      presenterPanel.style.right = '0';
-    });
-    closeBtn.addEventListener('click', () => {
-      presenterPanel.style.right = '-400px';
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && presenterPanel.style.right === '0px') {
-        presenterPanel.style.right = '-400px';
-      }
-    });
-
-    // Tooltip hover logic
-    const tooltip = document.getElementById('tooltip');
-    const tooltipElements = document.querySelectorAll('[data-tooltip]');
-
-    tooltipElements.forEach(el => {
-      el.addEventListener('mouseenter', (e) => {
-        const text = el.getAttribute('data-tooltip');
-        tooltip.textContent = text;
-        const rect = el.getBoundingClientRect();
-        // posiciona acima do elemento
-        const top = window.scrollY + rect.top - 10;
-        const left = window.scrollX + rect.left + (rect.width / 2);
-        tooltip.style.top = (top - tooltip.offsetHeight) + 'px';
-        tooltip.style.left = (left - (tooltip.offsetWidth / 2)) + 'px';
-        tooltip.style.opacity = '1';
-      });
-      el.addEventListener('mouseleave', (e) => {
-        tooltip.style.opacity = '0';
-      });
-    });
-
-    // Simulação de gráfico com Canvas (linha temporal do valor recuperado)
-    const ctx = document.getElementById('chartValueForecast').getContext('2d');
-
-    // dados simulados
-    const labels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    const dataAtual = [5, 8, 12, 15, 18, 21, 22, 24, 26, 28, 30, 32]; // em milhões
-    const dataPrevisto = dataAtual.map((v, i) => v * (1 + 0.12 * (i / 11))); // crescendo até +12%
-
-    // desenhar com Canvas puro
-    function drawLineChart(ctx, labels, data1, data2) {
-      const width = ctx.canvas.width;
-      const height = ctx.canvas.height;
-      ctx.clearRect(0,0,width,height);
-
-      // setup
-      const padding = 50;
-      const maxVal = Math.max(...data2) * 1.1;
-      const xStep = (width - 2*padding) / (labels.length - 1);
-      const yScale = (height - 2*padding) / maxVal;
-
-      // eixos
-      ctx.strokeStyle = '#666';
-      ctx.lineWidth = 1;
-      // eixo Y
-      ctx.beginPath();
-      ctx.moveTo(padding, padding);
-      ctx.lineTo(padding, height - padding);
-      ctx.lineTo(width - padding, height - padding);
-      ctx.stroke();
-
-      // linhas de grade horizontais
-      ctx.strokeStyle = '#333';
-      for (let i=0; i<=5; i++) {
-        let y = padding + ((height - 2*padding) /5) * i;
-        ctx.beginPath();
-        ctx.moveTo(padding, y);
-        ctx.lineTo(width - padding, y);
-        ctx.stroke();
-      }
-
-      // plot linhas
-      // linha atual
-      ctx.strokeStyle = '#00ff99';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      data1.forEach((val, i) => {
-        let x = padding + xStep * i;
-        let y = height - padding - (val * yScale);
-        if (i===0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-      ctx.stroke();
-
-      // linha prevista
-      ctx.strokeStyle = '#66ffcc';
-      ctx.lineWidth = 3;
-      ctx.setLineDash([10,5]);
-      ctx.beginPath();
-      dataPrevisto.forEach((val, i) => {
-        let x = padding + xStep * i;
-        let y = height - padding - (val * yScale);
-        if (i===0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // pontos
-      dataPrevisto.forEach((val, i) => {
-        let x = padding + xStep * i;
-        let y = height - padding - (val * yScale);
-        ctx.beginPath();
-        ctx.arc(x, y, 4, 0, 2 * Math.PI);
-        ctx.fillStyle = '#66ffcc';
-        ctx.fill();
-      });
-
-      dataAtual.forEach((val, i) => {
-        let x = padding + xStep * i;
-        let y = height - padding - (val * yScale);
-        ctx.beginPath();
-        ctx.arc(x, y, 4, 0, 2 * Math.PI);
-        ctx.fillStyle = '#00ff99';
-        ctx.fill();
-      });
-
-      // rótulos do eixo X
-      ctx.fillStyle = '#ccc';
-      ctx.font = '14px sans-serif';
-      labels.forEach((lab, i) => {
-        let x = padding + xStep * i;
-        let y = height - padding + 20;
-        ctx.fillText(lab, x - 10, y);
-      });
-
-      // rótulos de eixo Y
-      ctx.save();
-      ctx.translate(padding - 40, height/2);
-      ctx.rotate(-Math.PI/2);
-      ctx.fillText('Valor Recuperado (Milhões de R$)', 0, 0);
-      ctx.restore();
-
-      // legenda
-      ctx.fillStyle = '#00ff99';
-      ctx.fillRect(width - padding - 200, padding + 10, 15, 15);
-      ctx.fillStyle = '#ccc';
-      ctx.fillText('Atual', width - padding - 180, padding + 22);
-
-      ctx.fillStyle = '#66ffcc';
-      ctx.fillRect(width - padding - 200, padding + 40, 15, 15);
-      ctx.fillStyle = '#ccc';
-      ctx.fillText('Previsto (+12%)', width - padding - 180, padding + 52);
-    }
-
-    // redimensionar canvas para retina / dimensionamento
-    function resizeCanvas(canvas) {
-      const ratio = window.devicePixelRatio || 1;
-      const width = canvas.clientWidth * ratio;
-      const height = canvas.clientHeight * ratio;
-      if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
+      if (progress < duration) {
+        window.requestAnimationFrame(step);
       }
     }
+    window.requestAnimationFrame(step);
+  }
+  animateKPI('kpiValorDisputa', 0, 120, 1500);
+  animateKPI('kpiValorRecuperar', 0, 35, 1500);
+  animateKPI('kpiCumprimentoPrazos', 0, 92, 1500, '%');
+  animateKPI('kpiPrazoResposta', 10, 4.2, 1500, ' dias');
 
-    function renderChart() {
-      const canvas = document.getElementById('chartValueForecast');
-      resizeCanvas(canvas);
-      drawLineChart(canvas.getContext('2d'), labels, dataAtual, dataPrevisto);
+  // Chart.js charts configuration
+
+  // Mapa de Risco por Cliente (Pie)
+  const ctxRisco = document.getElementById('chartRiscoCliente').getContext('2d');
+  const chartRiscoCliente = new Chart(ctxRisco, {
+    type: 'pie',
+    data: {
+      labels: ['Alto Risco', 'Médio Risco', 'Baixo Risco'],
+      datasets: [{
+        label: 'Risco Clientes',
+        data: [63, 25, 12],
+        backgroundColor: ['#00ff99cc', '#009955cc', '#003322cc'],
+        borderColor: '#0a0f12',
+        borderWidth: 2,
+        hoverOffset: 20,
+      }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: '#00ff99',
+            font: {weight: 'bold', size: 14},
+            textShadow: '0 0 5px #00ff99'
+          }
+        }
+      }
     }
+  });
 
-    window.addEventListener('load', renderChart);
-    window.addEventListener('resize', renderChart);
+  // Fluxo Financeiro (Line)
+  const ctxFluxo = document.getElementById('chartFluxoFinanceiro').getContext('2d');
+  const chartFluxoFinanceiro = new Chart(ctxFluxo, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+      datasets: [{
+        label: 'Valor Atual (R$M)',
+        data: [8, 9, 10, 11, 12, 12, 13, 13, 14, 14, 15, 15],
+        borderColor: '#00ff99',
+        backgroundColor: '#00ff9955',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+        pointHoverRadius: 8,
+        borderWidth: 3
+      },{
+        label: 'Previsão (R$M)',
+        data: [8.4, 9.5, 10.8, 12, 13.5, 14, 15, 15.5, 16.2, 17, 18, 18.5],
+        borderColor: '#00cc66',
+        backgroundColor: '#00cc6655',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+        pointHoverRadius: 8,
+        borderWidth: 3,
+        borderDash: [8,5],
+      }]
+    },
+    options: {
+      interaction: {
+        mode: 'nearest',
+        intersect: false
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: '#00ff99',
+            font: {weight: 'bold', size: 14}
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          grid: {
+            color: '#004422',
+            borderColor: '#00ff99'
+          },
+          ticks: {
+            color: '#00ff99',
+            font: {weight: 'bold'}
+          }
+        },
+        x: {
+          grid: {
+            color: '#004422',
+            borderColor: '#00ff99'
+          },
+          ticks: {
+            color: '#00ff99',
+            font: {weight: 'bold'}
+          }
+        }
+      }
+    }
+  });
 
-  </script>
-</body>
-</html>
+  // Ranking de Produtividade (Bar)
+  const ctxRanking = document.getElementById('chartRankingProdutividade').getContext('2d');
+  const chartRankingProdutividade = new Chart(ctxRanking, {
+    type: 'bar
+
 
 
