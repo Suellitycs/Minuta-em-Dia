@@ -462,10 +462,52 @@
     }
   });
 
-  // Ranking de Produtividade (Bar)
-  const ctxRanking = document.getElementById('chartRankingProdutividade').getContext('2d');
-  const chartRankingProdutividade = new Chart(ctxRanking, {
-    type: 'bar
+// Ranking de Produtividade (Bar)
+const ctxRanking = document.getElementById('chartRankingProdutividade').getContext('2d');
+const chartRankingProdutividade = new Chart(ctxRanking, {
+  type: 'bar',
+  data: {
+    labels: ['Adv. A', 'Adv. B', 'Adv. C', 'Adv. D', 'Adv. E'],
+    datasets: [{
+      label: 'Casos resolvidos',
+      data: [48, 42, 39, 30, 25],
+      backgroundColor: '#00ff99aa',
+      borderColor: '#00cc66',
+      borderWidth: 2
+    }]
+  },
+  options: {
+    plugins: {
+      legend: {
+        display: false
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          color: '#00ff99',
+          font: { weight: 'bold' }
+        },
+        grid: {
+          color: '#004422'
+        }
+      },
+      x: {
+        ticks: {
+          color: '#00ff99',
+          font: { weight: 'bold' }
+        },
+        grid: {
+          color: '#004422'
+        }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
 
 
 
