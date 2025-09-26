@@ -1,513 +1,271 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dashboard Preditivo - Escritório Tributário</title>
-
-<!-- Chart.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
-  
-  /* Reset e base */
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0;
-    background: #0a0f12;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #a1f7d5;
-    overflow-x: hidden;
-  }
-  
-  /* Header */
-  header {
-    background: linear-gradient(90deg, #00ff99, #00cc66);
-    display: flex;
-    align-items: center;
-    padding: 15px 30px;
-    box-shadow: 0 5px 15px #00ff99aa;
-    position: relative;
-    user-select: none;
-  }
-  header img.logo {
-    height: 70px;
-    margin-right: 20px;
-    filter: drop-shadow(0 0 6px #00ff99);
-  }
-  header h1 {
-    font-family: 'Orbitron', monospace;
-    font-weight: 700;
-    font-size: 2.8rem;
-    text-shadow: 0 0 15px #00ff99;
-  }
-
-  /* Main container */
-  main {
-    padding: 25px 40px 60px 40px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
-    gap: 35px;
-  }
-
-  /* KPI cards */
-  .kpi-card {
-    background: #051312cc;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 0 20px #00ff99aa;
-    position: relative;
-    cursor: default;
-    transition: transform 0.3s ease;
-  }
-  .kpi-card:hover {
-    transform: translateZ(15px) scale(1.05);
-    box-shadow: 0 0 30px #00ff99ee;
-  }
-  .kpi-title {
-    font-weight: 700;
-    font-size: 1.2rem;
-    margin-bottom: 8px;
-    text-shadow: 0 0 7px #00ff99;
-  }
-  .kpi-value {
-    font-size: 2.8rem;
-    font-weight: 900;
-    font-family: 'Orbitron', monospace;
-    text-shadow: 0 0 10px #00ff99;
-  }
-  .kpi-sub {
-    margin-top: 5px;
-    font-size: 0.9rem;
-    color: #70e6b8;
-  }
-
-  /* Tooltip */
-  .tooltip {
-    position: absolute;
-    background: #003322dd;
-    color: #a1f7d5;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    max-width: 280px;
-    z-index: 1000;
-    box-shadow: 0 0 12px #00ff99bb;
-  }
-
-  /* Charts container */
-  .chart-container {
-    background: #051312cc;
-    padding: 20px 30px 30px 30px;
-    border-radius: 20px;
-    box-shadow: 0 0 25px #00ff9955;
-    cursor: default;
-    position: relative;
-  }
-  .chart-container:hover {
-    box-shadow: 0 0 40px #00ff99ee;
-  }
-  .chart-title {
-    font-weight: 700;
-    font-size: 1.4rem;
-    margin-bottom: 18px;
-    color: #00ff99;
-    text-shadow: 0 0 10px #00ff99;
-  }
-
-  /* Sidebar for presenter notes */
-  #notesPanel {
-    position: fixed;
-    top: 0;
-    right: -360px;
-    width: 360px;
-    height: 100vh;
-    background: #012214ee;
-    box-shadow: -8px 0 18px #00ff9944;
-    backdrop-filter: blur(6px);
-    color: #a1f7d5;
-    padding: 25px;
-    overflow-y: auto;
-    transition: right 0.35s ease;
-    z-index: 1100;
-  }
-  #notesPanel.open {
-    right: 0;
-  }
-  #notesPanel h2 {
-    font-family: 'Orbitron', monospace;
-    margin-top: 0;
-    font-size: 1.8rem;
-    color: #00ff99;
-    text-shadow: 0 0 15px #00ff99;
-  }
-  #notesPanel p {
-    line-height: 1.4;
-    margin-bottom: 1rem;
-  }
-  #notesPanel small {
-    display: block;
-    margin-top: 10px;
-    font-size: 0.8rem;
-    color: #00cc77aa;
-  }
-  #notesPanel .closeBtn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 2rem;
-    cursor: pointer;
-    color: #00ff99;
-    user-select: none;
-    transition: color 0.3s ease;
-  }
-  #notesPanel .closeBtn:hover {
-    color: #00cc66;
-  }
-
-  /* Button to open notes */
-  #openNotesBtn {
-    position: fixed;
-    top: 18px;
-    right: 18px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    filter: drop-shadow(0 0 3px #00ff99);
-    z-index: 1200;
-  }
-  #openNotesBtn svg {
-    width: 38px;
-    height: 38px;
-    fill: #00ff99;
-    transition: transform 0.3s ease;
-  }
-  #openNotesBtn:hover svg {
-    transform: rotate(360deg);
-    fill: #00cc66;
-  }
-
-  /* Responsive tweaks */
-  @media (max-width: 720px) {
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Preditivo - Escritório Tributário</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background: #0a0f12;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #a1f7d5;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: linear-gradient(90deg, #00ff99, #00cc66);
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      box-shadow: 0 4px 15px #00ff99aa;
+    }
+    header img.logo {
+      height: 60px;
+      margin-right: 20px;
+    }
+    header h1 {
+      font-size: 2em;
+      color: #fff;
+    }
     main {
       padding: 20px;
-      grid-template-columns: 1fr;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .kpi-card {
+      background: #051312cc;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #00ff99aa;
+      position: relative;
+    }
+    .kpi-title {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .kpi-value {
+      font-size: 2.2em;
+      font-weight: bold;
+      color: #00ff99;
+    }
+    .tooltip {
+      position: absolute;
+      background: #003322dd;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #a1f7d5;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 999;
+    }
+    .chart-container {
+      background: #051312cc;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #00ff99aa;
+    }
+    .chart-title {
+      margin-bottom: 10px;
+      font-size: 1.2em;
+      color: #00ff99;
     }
     #notesPanel {
-      width: 100%;
-      right: -100%;
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 400px;
+      height: 100vh;
+      background: #012214ee;
+      color: #a1f7d5;
+      padding: 20px;
+      overflow-y: auto;
+      transition: right 0.3s ease;
+      z-index: 1000;
     }
     #notesPanel.open {
       right: 0;
     }
-  }
-</style>
+    #notesPanel h2 {
+      color: #00ff99;
+    }
+    #notesPanel .closeBtn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 2rem;
+      cursor: pointer;
+    }
+    #openNotesBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 1100;
+    }
+    #openNotesBtn svg {
+      width: 30px;
+      height: 30px;
+      fill: #00ff99;
+    }
+  </style>
 </head>
 <body>
 
 <header>
-  <img src="logo.png" alt="Logo Escritório Tributário" class="logo" />
+  <img src="logo.png" alt="Logo" class="logo" />
   <h1>Relatório Preditivo – Escritório Tributário</h1>
 </header>
 
-<main>
-  <!-- KPI Cards -->
-  <div class="kpi-card" data-tooltip="Valor total em disputa no escritório tributário.">
-    <div class="kpi-title">Valor em Disputa</div>
-    <div class="kpi-value" id="kpiValorDisputa">R$ 120M</div>
-    <div class="kpi-sub">Montante em processos</div>
-  </div>
-  <div class="kpi-card" data-tooltip="Valor estimado a ser recuperado após análise preditiva.">
-    <div class="kpi-title">Valor a Recuperar</div>
-    <div class="kpi-value" id="kpiValorRecuperar">R$ 35M</div>
-    <div class="kpi-sub">Previsão em 12 meses</div>
-  </div>
-  <div class="kpi-card" data-tooltip="Percentual médio de cumprimento dos prazos do escritório.">
-    <div class="kpi-title">Cumprimento de Prazos</div>
-    <div class="kpi-value" id="kpiCumprimentoPrazos">92%</div>
-    <div class="kpi-sub">Média geral</div>
-  </div>
-  <div class="kpi-card" data-tooltip="Prazo médio de resposta das equipes.">
-    <div class="kpi-title">Prazo Médio de Resposta</div>
-    <div class="kpi-value" id="kpiPrazoResposta">4,2 dias</div>
-    <div class="kpi-sub">Redução esperada com automação</div>
-  </div>
-
-  <!-- Charts -->
-  <section class="chart-container" data-tooltip="Distribuição de risco dos clientes no escritório.">
-    <div class="chart-title">Mapa de Risco por Cliente</div>
-    <canvas id="chartRiscoCliente"></canvas>
-  </section>
-
-  <section class="chart-container" data-tooltip="Linha do tempo mostrando o fluxo financeiro e valores previstos.">
-    <div class="chart-title">Fluxo Financeiro (Projeção)</div>
-    <canvas id="chartFluxoFinanceiro"></canvas>
-  </section>
-
-  <section class="chart-container" data-tooltip="Ranking de produtividade dos advogados do escritório.">
-    <div class="chart-title">Ranking de Produtividade</div>
-    <canvas id="chartRankingProdutividade"></canvas>
-  </section>
-</main>
-
-<!-- Notas do Apresentador -->
-<button id="openNotesBtn" aria-label="Abrir Notas do Apresentador" title="Notas do Apresentador">
+<button id="openNotesBtn" title="Notas do Apresentador">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h16v2H4zM4 8h10v2H4zM4 12h16v2H4zM4 16h10v2H4z"/></svg>
 </button>
-<aside id="notesPanel" aria-hidden="true" role="complementary">
-  <span class="closeBtn" id="closeNotesBtn" role="button" tabindex="0" aria-label="Fechar notas">&times;</span>
+
+<aside id="notesPanel">
+  <span class="closeBtn" id="closeNotesBtn">&times;</span>
   <h2>Notas do Apresentador</h2>
-  <p>Este relatório preditivo visa fornecer uma visão estratégica da operação tributária do escritório.</p>
-  <p>Apresenta KPIs fundamentais como valores em disputa, recuperação esperada, riscos e prazos.</p>
-  <p>Os gráficos mostram a distribuição de riscos por cliente, projeções financeiras e produtividade dos advogados.</p>
-  <p>Este dashboard ajuda a tomar decisões baseadas em dados para maximizar a recuperação e reduzir riscos.</p>
-  <small>Pressione ESC para fechar este painel.</small>
+  <p>Este relatório preditivo fornece uma visão estratégica da operação tributária, com base em dados simulados. Ele mostra os principais KPIs da operação, gráficos de risco, produtividade e projeção financeira, visando orientar decisões do sócio do escritório.</p>
 </aside>
 
-<!-- Tooltip element -->
+<main>
+  <div class="kpi-card" data-tooltip="Valor total em disputa no escritório.">
+    <div class="kpi-title">Valor em Disputa</div>
+    <div class="kpi-value">R$ 120M</div>
+  </div>
+  <div class="kpi-card" data-tooltip="Valor previsto para recuperação nos próximos 12 meses.">
+    <div class="kpi-title">Valor a Recuperar</div>
+    <div class="kpi-value">R$ 35M</div>
+  </div>
+  <div class="kpi-card" data-tooltip="Percentual médio de cumprimento de prazos.">
+    <div class="kpi-title">Cumprimento de Prazos</div>
+    <div class="kpi-value">92%</div>
+  </div>
+  <div class="kpi-card" data-tooltip="Tempo médio de resposta das equipes.">
+    <div class="kpi-title">Prazo Médio de Resposta</div>
+    <div class="kpi-value">4,2 dias</div>
+  </div>
+
+  <div class="chart-container" data-tooltip="Distribuição de risco por cliente.">
+    <div class="chart-title">Mapa de Risco por Cliente</div>
+    <canvas id="chartRiscoCliente"></canvas>
+  </div>
+  <div class="chart-container" data-tooltip="Projeção de valores financeiros recuperados ao longo do tempo.">
+    <div class="chart-title">Fluxo Financeiro (Projeção)</div>
+    <canvas id="chartFluxoFinanceiro"></canvas>
+  </div>
+  <div class="chart-container" data-tooltip="Ranking de produtividade por advogado.">
+    <div class="chart-title">Ranking de Produtividade</div>
+    <canvas id="chartRankingProdutividade"></canvas>
+  </div>
+</main>
+
 <div class="tooltip" id="tooltip"></div>
 
 <script>
-  // Tooltip logic
-  const tooltip = document.getElementById('tooltip');
-
-  function showTooltip(e) {
-    const target = e.currentTarget;
-    const text = target.getAttribute('data-tooltip');
-    if (!text) return;
-
-    tooltip.textContent = text;
-    tooltip.style.opacity = '1';
-
-    const rect = target.getBoundingClientRect();
-    let left = e.pageX + 15;
-    let top = e.pageY + 15;
-
-    // Adjust to keep inside viewport
-    if (left + tooltip.offsetWidth > window.innerWidth) {
-      left = e.pageX - tooltip.offsetWidth - 15;
-    }
-    if (top + tooltip.offsetHeight > window.innerHeight) {
-      top = e.pageY - tooltip.offsetHeight - 15;
-    }
-
-    tooltip.style.left = left + 'px';
-    tooltip.style.top = top + 'px';
-  }
-  function hideTooltip() {
-    tooltip.style.opacity = '0';
-  }
-
-  // Attach tooltip listeners
-  document.querySelectorAll('[data-tooltip]').forEach(el => {
-    el.addEventListener('mousemove', showTooltip);
-    el.addEventListener('mouseleave', hideTooltip);
-  });
-
-  // Notas do apresentador
   const notesPanel = document.getElementById('notesPanel');
   const openNotesBtn = document.getElementById('openNotesBtn');
   const closeNotesBtn = document.getElementById('closeNotesBtn');
-
-  openNotesBtn.addEventListener('click', () => {
-    notesPanel.classList.add('open');
-    notesPanel.setAttribute('aria-hidden', 'false');
-  });
-  closeNotesBtn.addEventListener('click', () => {
-    notesPanel.classList.remove('open');
-    notesPanel.setAttribute('aria-hidden', 'true');
-  });
-  // Fechar com ESC
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && notesPanel.classList.contains('open')) {
-      notesPanel.classList.remove('open');
-      notesPanel.setAttribute('aria-hidden', 'true');
-    }
+  openNotesBtn.addEventListener('click', () => notesPanel.classList.add('open'));
+  closeNotesBtn.addEventListener('click', () => notesPanel.classList.remove('open'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') notesPanel.classList.remove('open');
   });
 
-  // KPIs - animação simples de contagem
-  function animateKPI(id, start, end, duration, suffix='') {
-    const el = document.getElementById(id);
-    let startTime = null;
+  const tooltip = document.getElementById('tooltip');
+  document.querySelectorAll('[data-tooltip]').forEach(el => {
+    el.addEventListener('mousemove', e => {
+      tooltip.textContent = el.dataset.tooltip;
+      tooltip.style.opacity = 1;
+      tooltip.style.left = e.pageX + 15 + 'px';
+      tooltip.style.top = e.pageY + 15 + 'px';
+    });
+    el.addEventListener('mouseleave', () => {
+      tooltip.style.opacity = 0;
+    });
+  });
 
-    function step(timestamp) {
-      if (!startTime) startTime = timestamp;
-      const progress = timestamp - startTime;
-      let value = start + (end - start) * (progress / duration);
-      if (start < end) {
-        if (value > end) value = end;
-      } else {
-        if (value < end) value = end;
-      }
-      if (id === 'kpiCumprimentoPrazos') value = value.toFixed(0); // % int
-      else if (id === 'kpiPrazoResposta') value = value.toFixed(1);
-      else value = Math.floor(value);
-
-      el.textContent = (id === 'kpiPrazoResposta' || id === 'kpiCumprimentoPrazos') 
-        ? value + suffix 
-        : 'R$ ' + value + (id === 'kpiValorDisputa' || id === 'kpiValorRecuperar' ? 'M' : '');
-      
-      if (progress < duration) {
-        window.requestAnimationFrame(step);
-      }
-    }
-    window.requestAnimationFrame(step);
-  }
-  animateKPI('kpiValorDisputa', 0, 120, 1500);
-  animateKPI('kpiValorRecuperar', 0, 35, 1500);
-  animateKPI('kpiCumprimentoPrazos', 0, 92, 1500, '%');
-  animateKPI('kpiPrazoResposta', 10, 4.2, 1500, ' dias');
-
-  // Chart.js charts configuration
-
-  // Mapa de Risco por Cliente (Pie)
-  const ctxRisco = document.getElementById('chartRiscoCliente').getContext('2d');
-  const chartRiscoCliente = new Chart(ctxRisco, {
+  const ctx1 = document.getElementById('chartRiscoCliente').getContext('2d');
+  new Chart(ctx1, {
     type: 'pie',
     data: {
       labels: ['Alto Risco', 'Médio Risco', 'Baixo Risco'],
       datasets: [{
-        label: 'Risco Clientes',
+        label: 'Risco',
         data: [63, 25, 12],
-        backgroundColor: ['#00ff99cc', '#009955cc', '#003322cc'],
-        borderColor: '#0a0f12',
-        borderWidth: 2,
-        hoverOffset: 20,
+        backgroundColor: ['#ff4d4d', '#ffcc00', '#00cc66']
       }]
-    },
-    options: {
-      plugins: {
-        legend: {
-          labels: {
-            color: '#00ff99',
-            font: {weight: 'bold', size: 14},
-            textShadow: '0 0 5px #00ff99'
-          }
-        }
-      }
     }
   });
 
-  // Fluxo Financeiro (Line)
-  const ctxFluxo = document.getElementById('chartFluxoFinanceiro').getContext('2d');
-  const chartFluxoFinanceiro = new Chart(ctxFluxo, {
+  const ctx2 = document.getElementById('chartFluxoFinanceiro').getContext('2d');
+  new Chart(ctx2, {
     type: 'line',
     data: {
-      labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+      labels: ['Q1', 'Q2', 'Q3', 'Q4'],
       datasets: [{
         label: 'Valor Atual (R$M)',
-        data: [8, 9, 10, 11, 12, 12, 13, 13, 14, 14, 15, 15],
+        data: [8, 9.5, 10.2, 11],
         borderColor: '#00ff99',
-        backgroundColor: '#00ff9955',
-        fill: true,
         tension: 0.3,
-        pointRadius: 5,
-        pointHoverRadius: 8,
-        borderWidth: 3
-      },{
-        label: 'Previsão (R$M)',
-        data: [8.4, 9.5, 10.8, 12, 13.5, 14, 15, 15.5, 16.2, 17, 18, 18.5],
-        borderColor: '#00cc66',
-        backgroundColor: '#00cc6655',
-        fill: true,
-        tension: 0.3,
-        pointRadius: 5,
-        pointHoverRadius: 8,
-        borderWidth: 3,
-        borderDash: [8,5],
+        fill: false
       }]
     },
     options: {
-      interaction: {
-        mode: 'nearest',
-        intersect: false
-      },
-      plugins: {
-        legend: {
-          labels: {
-            color: '#00ff99',
-            font: {weight: 'bold', size: 14}
-          }
-        }
-      },
       scales: {
         y: {
-          beginAtZero: false,
-          grid: {
-            color: '#004422',
-            borderColor: '#00ff99'
-          },
+          beginAtZero: true,
           ticks: {
-            color: '#00ff99',
-            font: {weight: 'bold'}
+            color: '#00ff99'
           }
         },
         x: {
-          grid: {
-            color: '#004422',
-            borderColor: '#00ff99'
-          },
           ticks: {
-            color: '#00ff99',
-            font: {weight: 'bold'}
+            color: '#00ff99'
           }
         }
       }
     }
   });
 
-// Ranking de Produtividade (Bar)
-const ctxRanking = document.getElementById('chartRankingProdutividade').getContext('2d');
-const chartRankingProdutividade = new Chart(ctxRanking, {
-  type: 'bar',
-  data: {
-    labels: ['Adv. A', 'Adv. B', 'Adv. C', 'Adv. D', 'Adv. E'],
-    datasets: [{
-      label: 'Casos resolvidos',
-      data: [48, 42, 39, 30, 25],
-      backgroundColor: '#00ff99aa',
-      borderColor: '#00cc66',
-      borderWidth: 2
-    }]
-  },
-  options: {
-    plugins: {
-      legend: {
-        display: false
-      }
+  const ctx3 = document.getElementById('chartRankingProdutividade').getContext('2d');
+  new Chart(ctx3, {
+    type: 'bar',
+    data: {
+      labels: ['Adv. A', 'Adv. B', 'Adv. C', 'Adv. D', 'Adv. E'],
+      datasets: [{
+        label: 'Casos Resolvidos',
+        data: [48, 42, 39, 30, 25],
+        backgroundColor: '#00ff99aa',
+        borderColor: '#00cc66',
+        borderWidth: 2
+      }]
     },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          color: '#00ff99',
-          font: { weight: 'bold' }
-        },
-        grid: {
-          color: '#004422'
-        }
+    options: {
+      plugins: {
+        legend: { display: false }
       },
-      x: {
-        ticks: {
-          color: '#00ff99',
-          font: { weight: 'bold' }
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#00ff99', font: { weight: 'bold' } },
+          grid: { color: '#004422' }
         },
-        grid: {
-          color: '#004422'
+        x: {
+          ticks: { color: '#00ff99', font: { weight: 'bold' } },
+          grid: { color: '#004422' }
         }
       }
     }
-  }
-});
+  });
 </script>
+
 </body>
 </html>
-
 
 
