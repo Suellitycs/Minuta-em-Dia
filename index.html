@@ -2,270 +2,181 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard Preditivo - Escritório Tributário</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatório Preditivo Tributário - Ivo Barboza</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      background: #0a0f12;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #a1f7d5;
+      background: #0b1114;
+      color: #aefbe2;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
     }
     header {
       background: linear-gradient(90deg, #00ff99, #00cc66);
+      padding: 20px;
       display: flex;
       align-items: center;
-      padding: 20px;
-      box-shadow: 0 4px 15px #00ff99aa;
+      gap: 20px;
     }
-    header img.logo {
+    header img {
       height: 60px;
-      margin-right: 20px;
     }
     header h1 {
+      color: white;
       font-size: 2em;
-      color: #fff;
     }
     main {
       padding: 20px;
+    }
+    section {
+      margin-bottom: 40px;
+      padding: 20px;
+      background-color: #081d18;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00ff9970;
+    }
+    section h2 {
+      color: #00ff99;
+    }
+    .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
     }
-    .kpi-card {
-      background: #051312cc;
-      padding: 20px;
+    .kpi {
+      background-color: #002e22;
+      padding: 15px;
       border-radius: 10px;
-      box-shadow: 0 0 15px #00ff99aa;
-      position: relative;
+      text-align: center;
+      box-shadow: 0 0 10px #00ff9970;
     }
-    .kpi-title {
+    .kpi h3 {
+      font-size: 1em;
+      color: #00ff99;
+    }
+    .kpi p {
+      font-size: 1.8em;
       font-weight: bold;
-      font-size: 1.2em;
-      margin-bottom: 10px;
+      margin: 10px 0 0;
     }
-    .kpi-value {
-      font-size: 2.2em;
-      font-weight: bold;
-      color: #00ff99;
-    }
-    .tooltip {
-      position: absolute;
-      background: #003322dd;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      color: #a1f7d5;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      z-index: 999;
-    }
-    .chart-container {
-      background: #051312cc;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px #00ff99aa;
-    }
-    .chart-title {
-      margin-bottom: 10px;
-      font-size: 1.2em;
-      color: #00ff99;
-    }
-    #notesPanel {
-      position: fixed;
-      top: 0;
-      right: -400px;
-      width: 400px;
-      height: 100vh;
-      background: #012214ee;
-      color: #a1f7d5;
-      padding: 20px;
-      overflow-y: auto;
-      transition: right 0.3s ease;
-      z-index: 1000;
-    }
-    #notesPanel.open {
-      right: 0;
-    }
-    #notesPanel h2 {
-      color: #00ff99;
-    }
-    #notesPanel .closeBtn {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      font-size: 2rem;
-      cursor: pointer;
-    }
-    #openNotesBtn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      z-index: 1100;
-    }
-    #openNotesBtn svg {
-      width: 30px;
-      height: 30px;
-      fill: #00ff99;
+    canvas {
+      background-color: #061410;
+      padding: 10px;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <img src="logo.png" alt="Logo" class="logo" />
+  <img src="logo.png" alt="Logo Escritório" />
   <h1>Relatório Preditivo – Escritório Tributário</h1>
 </header>
 
-<button id="openNotesBtn" title="Notas do Apresentador">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h16v2H4zM4 8h10v2H4zM4 12h16v2H4zM4 16h10v2H4z"/></svg>
-</button>
-
-<aside id="notesPanel">
-  <span class="closeBtn" id="closeNotesBtn">&times;</span>
-  <h2>Notas do Apresentador</h2>
-  <p>Este relatório preditivo fornece uma visão estratégica da operação tributária, com base em dados simulados. Ele mostra os principais KPIs da operação, gráficos de risco, produtividade e projeção financeira, visando orientar decisões do sócio do escritório.</p>
-</aside>
-
 <main>
-  <div class="kpi-card" data-tooltip="Valor total em disputa no escritório.">
-    <div class="kpi-title">Valor em Disputa</div>
-    <div class="kpi-value">R$ 120M</div>
-  </div>
-  <div class="kpi-card" data-tooltip="Valor previsto para recuperação nos próximos 12 meses.">
-    <div class="kpi-title">Valor a Recuperar</div>
-    <div class="kpi-value">R$ 35M</div>
-  </div>
-  <div class="kpi-card" data-tooltip="Percentual médio de cumprimento de prazos.">
-    <div class="kpi-title">Cumprimento de Prazos</div>
-    <div class="kpi-value">92%</div>
-  </div>
-  <div class="kpi-card" data-tooltip="Tempo médio de resposta das equipes.">
-    <div class="kpi-title">Prazo Médio de Resposta</div>
-    <div class="kpi-value">4,2 dias</div>
-  </div>
+  <section>
+    <h2>1. Contexto da Operação</h2>
+    <p>O escritório Ivo Barboza atua em demandas tributárias de alta complexidade, lidando com valores expressivos em disputa. Este relatório visa antecipar cenários, mitigar riscos e potencializar a recuperação de ativos para clientes estratégicos.</p>
+  </section>
 
-  <div class="chart-container" data-tooltip="Distribuição de risco por cliente.">
-    <div class="chart-title">Mapa de Risco por Cliente</div>
-    <canvas id="chartRiscoCliente"></canvas>
-  </div>
-  <div class="chart-container" data-tooltip="Projeção de valores financeiros recuperados ao longo do tempo.">
-    <div class="chart-title">Fluxo Financeiro (Projeção)</div>
-    <canvas id="chartFluxoFinanceiro"></canvas>
-  </div>
-  <div class="chart-container" data-tooltip="Ranking de produtividade por advogado.">
-    <div class="chart-title">Ranking de Produtividade</div>
-    <canvas id="chartRankingProdutividade"></canvas>
-  </div>
+  <section>
+    <h2>2. Pipeline de Dados</h2>
+    <p>O pipeline foi estruturado com múltiplas fontes de dados:</p>
+    <ul>
+      <li><strong>Ingestão:</strong> Dados financeiros, CRM, sistemas jurídicos.</li>
+      <li><strong>Transformação:</strong> Limpeza, enriquecimento e padronização.</li>
+      <li><strong>Modelagem:</strong> Machine Learning e séries temporais (Random Forest / Prophet).</li>
+      <li><strong>Visualização:</strong> Este dashboard interativo.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>3. Indicadores-Chave (KPIs)</h2>
+    <div class="kpi-grid">
+      <div class="kpi"><h3>Valor em Disputa</h3><p>R$ 120M</p></div>
+      <div class="kpi"><h3>Valor a Recuperar</h3><p>R$ 35M</p></div>
+      <div class="kpi"><h3>Risco de Perda</h3><p>R$ 18M</p></div>
+      <div class="kpi"><h3>Cumprimento de Prazos</h3><p>95%</p></div>
+      <div class="kpi"><h3>Prazo Médio de Resposta</h3><p>3,1 dias</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Gráficos Preditivos</h2>
+    <canvas id="graficoFluxo" height="120"></canvas>
+    <br><br>
+    <canvas id="graficoRisco" height="120"></canvas>
+  </section>
+
+  <section>
+    <h2>5. Insights Estratégicos</h2>
+    <ul>
+      <li>63% dos valores em disputa concentram-se em 4 clientes classificados como alto risco.</li>
+      <li>Automação de processos reduziu o prazo médio de resposta em 26% no último trimestre.</li>
+      <li>Priorizar ações com valor superior a R$ 5M pode aumentar a recuperação em até 18%.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>6. Plano de Ação Recomendado</h2>
+    <ol>
+      <li>Segmentar clientes por valor e risco para definir prioridades.</li>
+      <li>Expandir automação para áreas com alto volume de prazos.</li>
+      <li>Focar em renegociações estratégicas com empresas de maior litígio.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>7. Conclusão Executiva</h2>
+    <p>Com base no modelo preditivo, é possível recuperar até R$ 35 milhões nos próximos 12 meses, com risco de perda concentrado em poucos clientes. Há potencial de melhoria de performance de até 26% com reforço em automações e inteligência de dados.</p>
+  </section>
 </main>
 
-<div class="tooltip" id="tooltip"></div>
-
 <script>
-  const notesPanel = document.getElementById('notesPanel');
-  const openNotesBtn = document.getElementById('openNotesBtn');
-  const closeNotesBtn = document.getElementById('closeNotesBtn');
-  openNotesBtn.addEventListener('click', () => notesPanel.classList.add('open'));
-  closeNotesBtn.addEventListener('click', () => notesPanel.classList.remove('open'));
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') notesPanel.classList.remove('open');
-  });
-
-  const tooltip = document.getElementById('tooltip');
-  document.querySelectorAll('[data-tooltip]').forEach(el => {
-    el.addEventListener('mousemove', e => {
-      tooltip.textContent = el.dataset.tooltip;
-      tooltip.style.opacity = 1;
-      tooltip.style.left = e.pageX + 15 + 'px';
-      tooltip.style.top = e.pageY + 15 + 'px';
-    });
-    el.addEventListener('mouseleave', () => {
-      tooltip.style.opacity = 0;
-    });
-  });
-
-  const ctx1 = document.getElementById('chartRiscoCliente').getContext('2d');
-  new Chart(ctx1, {
-    type: 'pie',
-    data: {
-      labels: ['Alto Risco', 'Médio Risco', 'Baixo Risco'],
-      datasets: [{
-        label: 'Risco',
-        data: [63, 25, 12],
-        backgroundColor: ['#ff4d4d', '#ffcc00', '#00cc66']
-      }]
-    }
-  });
-
-  const ctx2 = document.getElementById('chartFluxoFinanceiro').getContext('2d');
-  new Chart(ctx2, {
-    type: 'line',
-    data: {
-      labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-      datasets: [{
-        label: 'Valor Atual (R$M)',
-        data: [8, 9.5, 10.2, 11],
-        borderColor: '#00ff99',
-        tension: 0.3,
-        fill: false
-      }]
+const ctxFluxo = document.getElementById('graficoFluxo').getContext('2d');
+new Chart(ctxFluxo, {
+  type: 'line',
+  data: {
+    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+    datasets: [{
+      label: 'Valor Recuperado (R$M)',
+      data: [2, 3, 4.2, 5.1, 6, 6.8, 7.2, 7.9, 8.6, 9.1, 10.2, 11],
+      borderColor: '#00ff99',
+      fill: false,
+      tension: 0.3
+    }]
+  },
+  options: {
+    scales: {
+      y: { ticks: { color: '#00ff99' } },
+      x: { ticks: { color: '#00ff99' } }
     },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            color: '#00ff99'
-          }
-        },
-        x: {
-          ticks: {
-            color: '#00ff99'
-          }
-        }
-      }
-    }
-  });
+    plugins: { legend: { labels: { color: '#00ff99' } } }
+  }
+});
 
-  const ctx3 = document.getElementById('chartRankingProdutividade').getContext('2d');
-  new Chart(ctx3, {
-    type: 'bar',
-    data: {
-      labels: ['Adv. A', 'Adv. B', 'Adv. C', 'Adv. D', 'Adv. E'],
-      datasets: [{
-        label: 'Casos Resolvidos',
-        data: [48, 42, 39, 30, 25],
-        backgroundColor: '#00ff99aa',
-        borderColor: '#00cc66',
-        borderWidth: 2
-      }]
+const ctxRisco = document.getElementById('graficoRisco').getContext('2d');
+new Chart(ctxRisco, {
+  type: 'bar',
+  data: {
+    labels: ['Cliente A', 'Cliente B', 'Cliente C', 'Cliente D', 'Cliente E'],
+    datasets: [{
+      label: 'Risco de Perda (R$M)',
+      data: [5, 4.2, 3.8, 3.2, 1.8],
+      backgroundColor: '#ff4d4d'
+    }]
+  },
+  options: {
+    scales: {
+      y: { ticks: { color: '#ff9999' } },
+      x: { ticks: { color: '#ff9999' } }
     },
-    options: {
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#00ff99', font: { weight: 'bold' } },
-          grid: { color: '#004422' }
-        },
-        x: {
-          ticks: { color: '#00ff99', font: { weight: 'bold' } },
-          grid: { color: '#004422' }
-        }
-      }
-    }
-  });
+    plugins: { legend: { labels: { color: '#ff9999' } } }
+  }
+});
 </script>
 
 </body>
 </html>
-
-
