@@ -39,6 +39,28 @@
     }
     section h2 {
       color: #00ff99;
+      position: relative;
+    }
+    section h2::after {
+      content: attr(data-tooltip);
+      visibility: hidden;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 0;
+      width: max-content;
+      max-width: 300px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    section h2:hover::after {
+      visibility: visible;
+      opacity: 1;
     }
     .kpi-grid {
       display: grid;
@@ -51,20 +73,27 @@
       border-radius: 10px;
       text-align: center;
       box-shadow: 0 0 10px #00ff9970;
+      position: relative;
     }
-    .kpi h3 {
-      font-size: 1em;
-      color: #00ff99;
-    }
-    .kpi p {
-      font-size: 1.8em;
-      font-weight: bold;
-      margin: 10px 0 0;
+    .kpi:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111;
+      color: #fff;
+      padding: 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+      font-size: 0.8em;
+      box-shadow: 0 0 10px #00ff9970;
     }
     canvas {
       background-color: #061410;
       padding: 10px;
       border-radius: 8px;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -77,103 +106,108 @@
 
 <main>
   <section>
-    <h2>1. Contexto da Operação</h2>
+    <h2 data-tooltip="Descrição do cenário e da atuação do escritório">1. Contexto da Operação</h2>
     <p>O escritório Ivo Barboza atua em demandas tributárias de alta complexidade, lidando com valores expressivos em disputa. Este relatório visa antecipar cenários, mitigar riscos e potencializar a recuperação de ativos para clientes estratégicos.</p>
   </section>
 
   <section>
-    <h2>2. Pipeline de Dados</h2>
-    <p>O pipeline foi estruturado com múltiplas fontes de dados:</p>
+    <h2 data-tooltip="Como os dados são tratados e transformados até chegar à visualização">2. Pipeline de Dados</h2>
     <ul>
-      <li><strong>Ingestão:</strong> Dados financeiros, CRM, sistemas jurídicos.</li>
-      <li><strong>Transformação:</strong> Limpeza, enriquecimento e padronização.</li>
-      <li><strong>Modelagem:</strong> Machine Learning e séries temporais (Random Forest / Prophet).</li>
-      <li><strong>Visualização:</strong> Este dashboard interativo.</li>
+      <li><strong>Ingestão:</strong> Dados financeiros, CRM, jurídicos.</li>
+      <li><strong>Transformação:</strong> Limpeza, enriquecimento.</li>
+      <li><strong>Modelagem:</strong> Machine Learning (Random Forest / Prophet).</li>
+      <li><strong>Visualização:</strong> Este dashboard.</li>
     </ul>
   </section>
 
   <section>
-    <h2>3. Indicadores-Chave (KPIs)</h2>
+    <h2 data-tooltip="Indicadores principais da operação tributária">3. KPIs e Indicadores</h2>
     <div class="kpi-grid">
-      <div class="kpi"><h3>Valor em Disputa</h3><p>R$ 120M</p></div>
-      <div class="kpi"><h3>Valor a Recuperar</h3><p>R$ 35M</p></div>
-      <div class="kpi"><h3>Risco de Perda</h3><p>R$ 18M</p></div>
-      <div class="kpi"><h3>Cumprimento de Prazos</h3><p>95%</p></div>
-      <div class="kpi"><h3>Prazo Médio de Resposta</h3><p>3,1 dias</p></div>
+      <div class="kpi" data-tooltip="Total de valores em disputa judicial"><strong>Valor em Disputa</strong><p>R$ 120M</p></div>
+      <div class="kpi" data-tooltip="Estimativa de valores passíveis de recuperação"><strong>Valor a Recuperar</strong><p>R$ 35M</p></div>
+      <div class="kpi" data-tooltip="Montante que pode ser perdido conforme modelagem"><strong>Risco de Perda</strong><p>R$ 18M</p></div>
+      <div class="kpi" data-tooltip="Percentual de prazos cumpridos dentro do SLA"><strong>Cumprimento de Prazos</strong><p>95%</p></div>
+      <div class="kpi" data-tooltip="Tempo médio de resposta a intimações e obrigações"><strong>Prazo Médio</strong><p>3,1 dias</p></div>
     </div>
   </section>
 
   <section>
-    <h2>4. Gráficos Preditivos</h2>
-    <canvas id="graficoFluxo" height="120"></canvas>
-    <br><br>
-    <canvas id="graficoRisco" height="120"></canvas>
+    <h2 data-tooltip="Progresso de valores recuperados ao longo do tempo">4. Valor Recuperado por Mês</h2>
+    <canvas id="graficoFluxo" height="100"></canvas>
   </section>
 
   <section>
-    <h2>5. Insights Estratégicos</h2>
-    <ul>
-      <li>63% dos valores em disputa concentram-se em 4 clientes classificados como alto risco.</li>
-      <li>Automação de processos reduziu o prazo médio de resposta em 26% no último trimestre.</li>
-      <li>Priorizar ações com valor superior a R$ 5M pode aumentar a recuperação em até 18%.</li>
-    </ul>
+    <h2 data-tooltip="Clientes com maior risco de perda financeira">5. Risco por Cliente</h2>
+    <canvas id="graficoRisco" height="100"></canvas>
   </section>
 
   <section>
-    <h2>6. Plano de Ação Recomendado</h2>
-    <ol>
-      <li>Segmentar clientes por valor e risco para definir prioridades.</li>
-      <li>Expandir automação para áreas com alto volume de prazos.</li>
-      <li>Focar em renegociações estratégicas com empresas de maior litígio.</li>
-    </ol>
+    <h2 data-tooltip="Produtividade individual e por equipe jurídica">6. Produtividade por Equipe</h2>
+    <canvas id="graficoEquipe" height="100"></canvas>
   </section>
 
-  <section>
-    <h2>7. Conclusão Executiva</h2>
-    <p>Com base no modelo preditivo, é possível recuperar até R$ 35 milhões nos próximos 12 meses, com risco de perda concentrado em poucos clientes. Há potencial de melhoria de performance de até 26% com reforço em automações e inteligência de dados.</p>
-  </section>
 </main>
 
 <script>
-const ctxFluxo = document.getElementById('graficoFluxo').getContext('2d');
-new Chart(ctxFluxo, {
+const ctx1 = document.getElementById('graficoFluxo').getContext('2d');
+new Chart(ctx1, {
   type: 'line',
   data: {
-    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago'],
     datasets: [{
       label: 'Valor Recuperado (R$M)',
-      data: [2, 3, 4.2, 5.1, 6, 6.8, 7.2, 7.9, 8.6, 9.1, 10.2, 11],
+      data: [1.2, 2.5, 3.1, 4.6, 5.9, 6.8, 7.4, 8.1],
       borderColor: '#00ff99',
       fill: false,
-      tension: 0.3
+      tension: 0.4
     }]
   },
   options: {
+    plugins: { legend: { labels: { color: '#00ff99' } } },
     scales: {
-      y: { ticks: { color: '#00ff99' } },
-      x: { ticks: { color: '#00ff99' } }
-    },
-    plugins: { legend: { labels: { color: '#00ff99' } } }
+      x: { ticks: { color: '#00ff99' } },
+      y: { ticks: { color: '#00ff99' } }
+    }
   }
 });
 
-const ctxRisco = document.getElementById('graficoRisco').getContext('2d');
-new Chart(ctxRisco, {
+const ctx2 = document.getElementById('graficoRisco').getContext('2d');
+new Chart(ctx2, {
   type: 'bar',
   data: {
-    labels: ['Cliente A', 'Cliente B', 'Cliente C', 'Cliente D', 'Cliente E'],
+    labels: ['Cliente A', 'Cliente B', 'Cliente C', 'Cliente D'],
     datasets: [{
       label: 'Risco de Perda (R$M)',
-      data: [5, 4.2, 3.8, 3.2, 1.8],
-      backgroundColor: '#ff4d4d'
+      data: [5.1, 4.3, 3.8, 2.9],
+      backgroundColor: ['#ff4d4d', '#ff704d', '#ff944d', '#ffb84d']
     }]
   },
   options: {
+    plugins: { legend: { labels: { color: '#ffaaaa' } } },
     scales: {
-      y: { ticks: { color: '#ff9999' } },
-      x: { ticks: { color: '#ff9999' } }
-    },
-    plugins: { legend: { labels: { color: '#ff9999' } } }
+      x: { ticks: { color: '#ffaaaa' } },
+      y: { ticks: { color: '#ffaaaa' } }
+    }
+  }
+});
+
+const ctx3 = document.getElementById('graficoEquipe').getContext('2d');
+new Chart(ctx3, {
+  type: 'bar',
+  data: {
+    labels: ['Equipe Alfa', 'Equipe Beta', 'Equipe Gama'],
+    datasets: [{
+      label: 'Casos Resolvidos',
+      data: [28, 34, 22],
+      backgroundColor: '#00cc99'
+    }]
+  },
+  options: {
+    plugins: { legend: { labels: { color: '#00ffcc' } } },
+    scales: {
+      x: { ticks: { color: '#00ffcc' } },
+      y: { ticks: { color: '#00ffcc' } }
+    }
   }
 });
 </script>
